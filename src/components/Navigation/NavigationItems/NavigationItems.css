@@ -1,0 +1,27 @@
+
+/* ***********************************************************
+                       Mobile CSS
+***************************************************************/
+.NavigationItems
+{
+    margin:0;
+    padding: 0;
+    list-style-type: none;
+    display:flex;
+    height:100%;
+    /* So that items presents beneath each other */
+    flex-flow: column;
+    /* All Items wil be close to each other */
+    align-items: center;
+}
+
+
+/* ***********************************************************
+                        Desktop CSS
+***************************************************************/
+@media (min-width:500px)
+{
+    .NavigationItems{
+        flex-flow: row;
+    }
+}

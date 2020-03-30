@@ -1,0 +1,12 @@
+.Logo
+{
+    height: 100%;
+    padding: 8px;
+    background-color: white;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+/* imp so that the image does not take the default height */
+.Logo img{
+    height: 100%;
+}

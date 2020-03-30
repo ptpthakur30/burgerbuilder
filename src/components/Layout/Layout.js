@@ -3,15 +3,29 @@
  *  Toolbars , SideDrawers and Backdrop
  *  The BurgerBuilder is Passed through it as prop.children
  */
-import React from 'react'
+import React, { Component } from 'react'
 import Aux from '../../hoc/Auxiliary'
 import classes from './Layout.css'
-const layout = (props) => (
-    <Aux>
-        <div>Toolbar,Sidedrawer,Backdrop</div>
-        <main className={classes.Content}>
-            {props.children}
-        </main>
-    </Aux>
-);
-export default layout;
+import Toolbar from '../Navigation/Toolbar/Toolbar'
+import SideDrawer from '../Navigation/SideDrawer/SideDrawer'
+
+class Layout extends Component {
+    state = {
+        showSideDrawer: true
+    }
+    sideDrawerClosedFunction = () => {
+        this.setState({ showSideDrawer: false });
+    }
+    render() {
+        return (
+            <Aux>
+                <Toolbar />
+                <SideDrawer showSideDrawer={this.state.showSideDrawer} closed={this.sideDrawerClosedFunction}/>
+                <main className={classes.Content}>
+                    {this.props.children}
+                </main>
+            </Aux>
+        )
+    }
+}
+export default Layout;
