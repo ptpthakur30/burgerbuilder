@@ -5,7 +5,7 @@
  * The Build Controls
  */
 import React, { Component } from 'react'
-import Aux from '../../hoc/Auxiliary'
+import Aux from '../../hoc/Auxiliary/Auxiliary'
 import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
@@ -107,6 +107,9 @@ class BurgerBuilder extends Component {
         return (
             <Aux>
                 {/* Used to see the model and Order Summary within it */}
+                {/* The Order summary should only be rendered when the modal is rendered
+                Therefore we can improve performance by adding class component lifecycle
+                */}
                 <Modal show={this.state.showOrderSummary} cancelPurchase={this.cancelPurchaseHandler}>
                     <OrderSummary
                         ingredients={this.state.ingredients}
