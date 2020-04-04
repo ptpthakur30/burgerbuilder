@@ -10,7 +10,9 @@ import Burger from '../../components/Burger/Burger'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
-
+import Axios from '../../axios-order'
+import Spinner from '../../components/UI/Spinner/Spinner'
+import WithErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 const INGREDIENT_PRICES = {
     salad: 5,
     cheese: 10,
@@ -20,15 +22,21 @@ const INGREDIENT_PRICES = {
 
 class BurgerBuilder extends Component {
     state = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0
-        },
+        ingredients: null,
         totalPrice: 5,
         purchasable: false,
-        showOrderSummary: false
+        showOrderSummary: false,
+        loading: false,
+        error : false
+    }
+
+    componentDidMount() {
+        Axios.get('https://burger-builder-7d519.firebaseio.com/ingredients.json')
+            .then(response =>
+                this.setState({ ingredients: response.data })
+            ).catch(error=>{
+                this.setState({error:error})
+            })
     }
 
     // To activate or deactivate the Order Now button based on the ingredients total count
@@ -53,8 +61,26 @@ class BurgerBuilder extends Component {
         this.setState({ showOrderSummary: false });
     }
 
-    purchaseContinueHandler=()=>{
-        alert('You continued the Order');
+    purchaseContinueHandler = () => {
+        // alert('You continued the Order');
+        this.setState({ loading: true });
+        const orderDetails = {
+            ingredients: this.state.ingredients,
+            totalPrice: this.state.totalPrice,
+            customer: {
+                name: 'testUser',
+                address: {
+                    street: '123 street',
+                    zipCode: '420031',
+                    country: 'India'
+                },
+                email: 'test@test.com'
+            },
+            deliveryMethod: 'fastest'
+        }
+        Axios.post('/orders.json', orderDetails)
+            .then(response => this.setState({ loading: false, showOrderSummary: false }))
+            .catch(error => this.setState({ loading: false, showOrderSummary: false }));
     }
 
     // For adding the ingredients
@@ -104,36 +130,47 @@ class BurgerBuilder extends Component {
         for (let key in disabledButton) {
             disabledButton[key] = disabledButton[key] <= 0;
         }
+        let ordersSummary = null;
+        let burger = this.state.error?<p>Ingredients cannot be loaded</p>:<Spinner />;
+        if (this.state.ingredients) {
+            burger = (
+                <Aux>
+                    {/* Used to see the Burger with all the ingredients */}
+                    <Burger ingredients={this.state.ingredients} />
+
+                    {/* Used to see the controller for adding and removing the ingredients and order now button */}
+                    <BuildControls
+                        ingredientAdded={this.addIngredientHandler}
+                        ingredientDeleted={this.deleteIngredientHandler}
+                        disabledBtn={disabledButton}
+                        currentPrice={this.state.totalPrice}
+                        purchasable={this.state.purchasable}
+                        ordered={this.orderHandler}
+                    />
+                </Aux>
+            );
+            ordersSummary = <OrderSummary
+                ingredients={this.state.ingredients}
+                purchaseContinue={this.purchaseContinueHandler}
+                purchaseCancel={this.cancelPurchaseHandler}
+                price={this.state.totalPrice}
+            />
+        }
+        if (this.state.loading) {
+            ordersSummary = <Spinner />;
+        }
         return (
             <Aux>
                 {/* Used to see the model and Order Summary within it */}
                 {/* The Order summary should only be rendered when the modal is rendered
                 Therefore we can improve performance by adding class component lifecycle
                 */}
-                <Modal show={this.state.showOrderSummary} cancelPurchase={this.cancelPurchaseHandler}>
-                    <OrderSummary
-                        ingredients={this.state.ingredients}
-                        purchaseContinue={this.purchaseContinueHandler}
-                        purchaseCancel={this.cancelPurchaseHandler}
-                        price={this.state.totalPrice}
-                    />
+                <Modal show={this.state.showOrderSummary} clicked={this.cancelPurchaseHandler}>
+                    {ordersSummary}
                 </Modal>
-
-                {/* Used to see the Burger with all the ingredients */}
-                <Burger ingredients={this.state.ingredients} />
-
-                {/* Used to see the controller for adding and removing the ingredients and order now button */}
-                <BuildControls
-                    ingredientAdded={this.addIngredientHandler}
-                    ingredientDeleted={this.deleteIngredientHandler}
-                    disabledBtn={disabledButton}
-                    currentPrice={this.state.totalPrice}
-                    purchasable={this.state.purchasable}
-                    ordered={this.orderHandler}
-                />
-
+                {burger}
             </Aux>
         )
     }
 }
-export default BurgerBuilder;
+export default WithErrorHandler(BurgerBuilder, Axios);
