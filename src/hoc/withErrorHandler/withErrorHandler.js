@@ -7,7 +7,7 @@ import Modal from '../../components/UI/Modal/Modal'
 import Aux from '../Auxiliary/Auxiliary'
 
 const withErrorHandler = (WrappedComponent, axios) => {
-    return class extends Component {
+    return class dad extends Component {
         state={
             error:null
         }
@@ -17,8 +17,9 @@ const withErrorHandler = (WrappedComponent, axios) => {
         }
 
         // It will be called when the component is created , the child has not rendered
-        componentWillMount()
+        constructor()
         {
+            super();
             // We need to return the request so that the request may continue
            this.reqInterceptor=axios.interceptors.request.use(req=>{
                 this.setState({error:null})
