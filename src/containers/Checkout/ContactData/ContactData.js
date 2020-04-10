@@ -156,6 +156,7 @@ export class ContactData extends Component {
         return isValid;
     }
     render() {
+        // for getting the form elements from the js state
         const formElementsArray = [];
         for (let key in this.state.orderform) {
             formElementsArray.push({
@@ -178,7 +179,8 @@ export class ContactData extends Component {
                         changed={(event) => this.inputChangedHandler(event, formElement.id)}
                     />
                 ))}
-                <Button btnType="Success" clicked={this.orderHandler} disabled={!this.state.formIsValid}>ORDER</Button>
+                <Button btnType="Success" clicked={this.orderHandler} 
+                disabled={!this.state.formIsValid}>ORDER</Button>
             </form>
         );
         if (this.state.loading) {

@@ -6,7 +6,9 @@ const input = (props) => {
     let validationError = null;
     if (!props.valid && props.shouldValidate && props.touched) {
         inputClasses.push(classes.Invalid)
-        validationError = <p className={classes.ValidationError}>Please enter a valid {props.elementName.toUpperCase()}</p>
+        validationError = <p className={classes.ValidationError}>
+            Please enter a valid {props.elementName.toUpperCase()}
+            </p>
     }
     inputClasses = inputClasses.join(' ');
     switch (props.elementType) {
@@ -33,7 +35,6 @@ const input = (props) => {
                     value={props.value}
                     onChange={props.changed}
                 >
-
                     {props.elementConfig.options.map(option => (
                         <option
                             key={option.value}
@@ -56,7 +57,7 @@ const input = (props) => {
     }
     return (
         <div className={classes.Input}>
-            <label className={classes.Lable}>{props.label}</label>
+            <label className={classes.Label}>{props.label}</label>
             {inputElement}
             {validationError}
         </div>
