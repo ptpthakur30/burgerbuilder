@@ -2,7 +2,8 @@
  * The contact data is used to show and handle forms, the form is submitted in the firebase
  */
 import React, { Component } from 'react'
-import classes from './ContactData.css'
+import classes from './ContactData.css';
+import {connect} from 'react-redux'
 import Button from '../../../components/UI/Button/Button'
 import Axios from '../../../axios-order'
 import Spinner from '../../../components/UI/Spinner/Spinner'
@@ -195,4 +196,11 @@ export class ContactData extends Component {
     }
 }
 
-export default ContactData
+const mapStateToProps = state=>{
+    return {
+        ingredients : state.ingredients,
+        price : state.totalPrice
+    }
+}
+
+export default connect(mapStateToProps)(ContactData);
