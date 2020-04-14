@@ -9996,3 +9996,6 @@ node_modules/core-js/library/es7/object.js
 node_modules/core-js/library/es7/observable.js
 node_modules/core-js/library/es7/promise.js
 node_modules/core-js/library/es7/reflect.js
+
+# Local Netlify folder
+.netlify
