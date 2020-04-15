@@ -1,7 +1,8 @@
 /**
  * Reducer is a fucntion that takes the old state and action and returns the new state based on the action type
  */
-import * as actionTypes from './actions'
+import * as actionTypes from '../actions/actionTypes'
+
 // The price of individual ingerdient
 const INGREDIENT_PRICES = {
     salad: 5,
@@ -12,13 +13,9 @@ const INGREDIENT_PRICES = {
 
 // Initial state
 const initialState = {
-    ingredients: {
-        salad: 0,
-        cheese: 0,
-        bacon: 0,
-        meat: 0
-    },
-    totalPrice: 5
+    ingredients: null,
+    totalPrice: 5,
+    error:false
 }
 
 const reducer = (state = initialState, action) => {
@@ -47,6 +44,24 @@ const reducer = (state = initialState, action) => {
                     [action.ingredientName]: state.ingredients[action.ingredientName] - 1,
                 },
                 totalPrice: state.totalPrice - INGREDIENT_PRICES[action.ingredientName]
+            }
+        case actionTypes.SET_INGREDIENTS:
+            return {
+                ...state,
+                // ingredients : action.ingredients,
+                ingredients : {
+                    salad:action.ingredients.salad,
+                    bacon:action.ingredients.bacon,
+                    cheese:action.ingredients.cheese,
+                    meat:action.ingredients.meat
+                }
+                ,
+                error : false
+            }
+        case actionTypes.SET_INGREDIENTS_FAILED:
+            return {
+                ...state,
+                error : true
             }
         default:
             return state;
