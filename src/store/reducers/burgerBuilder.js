@@ -16,7 +16,8 @@ const INGREDIENT_PRICES = {
 const initialState = {
     ingredients: null,
     totalPrice: 5,
-    error: false
+    error: false,
+    building:false
 }
 
 const addIngredients = (state, action) => {
@@ -28,7 +29,8 @@ const addIngredients = (state, action) => {
             // This will assign a new value to the passes property
             [action.ingredientName]: state.ingredients[action.ingredientName] + 1,
         },
-        totalPrice: state.totalPrice + INGREDIENT_PRICES[action.ingredientName]
+        totalPrice: state.totalPrice + INGREDIENT_PRICES[action.ingredientName],
+        building:true
     }
 }
 
@@ -54,7 +56,8 @@ const setIngredients = (state, action) => {
                 meat: action.ingredients.meat
             },
             totalPrice: 5,
-            error: false
+            error: false,
+            building:false
         })
 }
 

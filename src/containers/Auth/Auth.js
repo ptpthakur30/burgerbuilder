@@ -45,6 +45,16 @@ export class Auth extends Component {
         isSignUp: true
     }
 
+    componentDidMount()
+    {
+        // if the user is not building burger and the authRedirectPath is '/checkout'
+        // We are redirecting to '/' after login
+        if(!this.props.buildingBurger && this.props.authRedirectPath !== '/')
+        {
+            this.props.onSetAuthRedirectPath();
+        }
+    }
+
     // Handles the onChange event of the input element
     inputChangedHandler = (event, elementName) => {
         const updatedControl = {
@@ -136,7 +146,10 @@ export class Auth extends Component {
         let authRedirect=null
         if(this.props.isAuthenticated)
         {
-            authRedirect = <Redirect to="/"/>
+            // Here we are dynamically setting the redirect path
+            // CASE '/' : When the user is not building burger
+            // CASE '/checkout' : When the user has built a burger and is redirected to authentication page
+            authRedirect = <Redirect to={this.props.authRedirectPath}/>
         }
         return (
             <div className={classes.Auth}>
@@ -154,12 +167,15 @@ const mapStateToProps = state => {
     return {
         loading: state.auth.loading,
         error: state.auth.error,
-        isAuthenticated: state.auth.token !== null
+        isAuthenticated: state.auth.token !== null,
+        buildingBurger : state.burgerBuilder.building,
+        authRedirectPath : state.auth.authRedirectPath
     }
 }
 const mapDispatchToProps = dispatch => {
     return {
-        onAuthSubmit: (email, password, method) => dispatch(authActions.auth(email, password, method))
+        onAuthSubmit: (email, password, method) => dispatch(authActions.auth(email, password, method)),
+        onSetAuthRedirectPath: ()=>dispatch(authActions.setAuthRedirectPath('/'))
     }
 }
 

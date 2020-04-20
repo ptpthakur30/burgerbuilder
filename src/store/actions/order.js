@@ -73,11 +73,14 @@ export const fetchOrderStart = () => {
 }
 
 // To fetch the orders from database and pass the token for authentication
-export const fetchOrders = (token) => {
+export const fetchOrders = (token,userId) => {
     return dispatch => {
         dispatch(fetchOrderStart())
+        // pass the auth token
+        // pass the orderBy="userId" and &equalTo="userId" for filtering by userId
+        const queryParams = '?auth='+token+'&orderBy="userId"'+'&equalTo="'+userId+'"'
         // passing the auth token
-        axios.get('/orders.json?auth='+token)
+        axios.get('/orders.json'+queryParams)
             .then(response => {
                 const fetchedata = [];
                 for (let key in response.data) {

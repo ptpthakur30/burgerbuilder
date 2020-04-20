@@ -34,18 +34,20 @@ class BurgerBuilder extends Component {
             .reduce((sum, elr) => {
                 return sum + elr;
             }, 0);
-        return sum > 0 ;
+        return sum > 0;
     }
 
     // To check whether the Order Now Button has been clicked or not
     orderHandler = () => {
-        if(this.props.isAuthenticated)
-        {
+        // if authentication is true then modal is shown
+        if (this.props.isAuthenticated) {
             this.setState({ showOrderSummary: true });
         }
-        else{
+        else {
             // To redirect the user to the auth page if not authenticated
             this.props.history.push('/auth');
+            // to set the redirect path once the user successfully sign in in authentication page
+            this.props.onSetAuthRedirectPath('/checkout');
         }
     }
 
@@ -84,7 +86,7 @@ class BurgerBuilder extends Component {
                         // Call a function when a component renders
                         purchasable={this.purchaseHandler(this.props.ingredients)}
                         ordered={this.orderHandler}
-                        isAuth = {this.props.isAuthenticated}
+                        isAuth={this.props.isAuthenticated}
                     />
                 </Aux>
             );
@@ -95,7 +97,7 @@ class BurgerBuilder extends Component {
                 price={this.props.price}
             />
         }
-       
+
         return (
             <Aux>
                 {/* Used to see the model and Order Summary within it */}
@@ -115,9 +117,9 @@ class BurgerBuilder extends Component {
 const mapStateToProps = state => {
     return {
         ingredients: state.burgerBuilder.ingredients,
-        price : state.burgerBuilder.totalPrice,
-        error : state.burgerBuilder.error,
-        isAuthenticated : state.auth.token !==null
+        price: state.burgerBuilder.totalPrice,
+        error: state.burgerBuilder.error,
+        isAuthenticated: state.auth.token !== null
     }
 }
 
@@ -127,10 +129,11 @@ const mapDispatchToProps = dispatch => {
         // use dispatch here
         onIngredientAdded: (ingredientName) => dispatch(actions.addIngredients(ingredientName)),
         onIngredientRemoved: (ingredientName) => dispatch(actions.removeIngredients(ingredientName)),
-        onInitIngredients: ()=>dispatch(actions.initIngredients()),
-        onPurchaseInit: ()=>dispatch(actions.purchaseInit())
+        onInitIngredients: () => dispatch(actions.initIngredients()),
+        onPurchaseInit: () => dispatch(actions.purchaseInit()),
+        onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path))
     }
 };
 
 // the connect is used to pass the action and use the state as props in the container
-export default connect(mapStateToProps,mapDispatchToProps)(WithErrorHandler(BurgerBuilder, Axios));
+export default connect(mapStateToProps, mapDispatchToProps)(WithErrorHandler(BurgerBuilder, Axios));

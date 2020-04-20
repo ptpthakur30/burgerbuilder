@@ -111,7 +111,9 @@ export class ContactData extends Component {
         const orderDetails = {
             ingredients: this.props.ingredients,
             totalPrice: this.props.price,
-            orderData: formvalue
+            orderData: formvalue,
+            // pass the userId for filtering order based on userId
+            userId : this.props.userId
         }
         // passing the auth token
         this.props.onOrderBurger(orderDetails,this.props.token);
@@ -210,7 +212,8 @@ const mapStateToProps = state=>{
         ingredients : state.burgerBuilder.ingredients,
         price : state.burgerBuilder.totalPrice,
         loading : state.order.loading,
-        token : state.auth.token
+        token : state.auth.token,
+        userId : state.auth.userId
     }
 }
 
