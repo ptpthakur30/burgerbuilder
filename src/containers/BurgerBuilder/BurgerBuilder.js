@@ -14,7 +14,7 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
 import Axios from '../../axios-order'
 import Spinner from '../../components/UI/Spinner/Spinner'
 import WithErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
-import * as BurgerBuilderActions from '../../store/actions/index'
+import * as actions from '../../store/actions/index'
 
 class BurgerBuilder extends Component {
     state = {
@@ -39,7 +39,14 @@ class BurgerBuilder extends Component {
 
     // To check whether the Order Now Button has been clicked or not
     orderHandler = () => {
-        this.setState({ showOrderSummary: true });
+        if(this.props.isAuthenticated)
+        {
+            this.setState({ showOrderSummary: true });
+        }
+        else{
+            // To redirect the user to the auth page if not authenticated
+            this.props.history.push('/auth');
+        }
     }
 
     // To check whether the Order Now Button has been clicked or not
@@ -48,18 +55,8 @@ class BurgerBuilder extends Component {
     }
 
     purchaseContinueHandler = () => {
-
-        let queryParams = [];
-        //here for multiple key value pair we used array
-        for (let i in this.state.ingredients) {
-            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
-        }
-        queryParams.push('price=' + this.state.totalPrice);
-        queryParams = queryParams.join('&');
-        this.props.history.push({
-            pathname: '/checkout',
-            search: '?' + queryParams
-        });
+        this.props.onPurchaseInit()
+        this.props.history.push('/checkout');
     }
 
     render() {
@@ -87,6 +84,7 @@ class BurgerBuilder extends Component {
                         // Call a function when a component renders
                         purchasable={this.purchaseHandler(this.props.ingredients)}
                         ordered={this.orderHandler}
+                        isAuth = {this.props.isAuthenticated}
                     />
                 </Aux>
             );
@@ -116,9 +114,10 @@ class BurgerBuilder extends Component {
 // for getting the slide of state from store as props
 const mapStateToProps = state => {
     return {
-        ingredients: state.ingredients,
-        price : state.totalPrice,
-        error : state.error
+        ingredients: state.burgerBuilder.ingredients,
+        price : state.burgerBuilder.totalPrice,
+        error : state.burgerBuilder.error,
+        isAuthenticated : state.auth.token !==null
     }
 }
 
@@ -126,9 +125,10 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         // use dispatch here
-        onIngredientAdded: (ingredientName) => dispatch(BurgerBuilderActions.addIngredients(ingredientName)),
-        onIngredientRemoved: (ingredientName) => dispatch(BurgerBuilderActions.removeIngredients(ingredientName)),
-        onInitIngredients: ()=>dispatch(BurgerBuilderActions.initIngredients())
+        onIngredientAdded: (ingredientName) => dispatch(actions.addIngredients(ingredientName)),
+        onIngredientRemoved: (ingredientName) => dispatch(actions.removeIngredients(ingredientName)),
+        onInitIngredients: ()=>dispatch(actions.initIngredients()),
+        onPurchaseInit: ()=>dispatch(actions.purchaseInit())
     }
 };
 

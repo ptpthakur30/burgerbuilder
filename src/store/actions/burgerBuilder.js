@@ -29,6 +29,7 @@ export const initIngredients = () => {
     }
 }
 
+// For storing the value of ingredients on store
 export const setIngredients = (ingredients) => {
     return {
         type: actionTypes.SET_INGREDIENTS,

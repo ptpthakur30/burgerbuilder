@@ -51,7 +51,8 @@ export class ContactData extends Component {
                 validation: {
                     required: true,
                     minLength: 5,
-                    maxLength: 5
+                    maxLength: 5,
+                    isNumeric: true
                 },
                 valid: false,
                 touched: false,
@@ -77,7 +78,8 @@ export class ContactData extends Component {
                     placeholder: 'Your E-mail'
                 },
                 validation: {
-                    required: true
+                    required: true,
+                    isEmail: true
                 },
                 valid: false,
                 touched: false,
@@ -111,7 +113,8 @@ export class ContactData extends Component {
             totalPrice: this.props.price,
             orderData: formvalue
         }
-        this.props.onOrderBurger(orderDetails);
+        // passing the auth token
+        this.props.onOrderBurger(orderDetails,this.props.token);
     }
 
     inputChangedHandler = (event, inputIdentifier) => {
@@ -150,6 +153,16 @@ export class ContactData extends Component {
         if (rules.maxLength) {
             isValid = value.length <= rules.maxLength && isValid;
         }
+        if (rules.isEmail) {
+            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+            isValid = pattern.test(value) && isValid
+        }
+
+        if (rules.isNumeric) {
+            const pattern = /^\d+$/;
+            isValid = pattern.test(value) && isValid
+        }
+
         return isValid;
     }
     render() {
@@ -194,15 +207,16 @@ export class ContactData extends Component {
 
 const mapStateToProps = state=>{
     return {
-        ingredients : state.ingredients,
-        price : state.totalPrice,
-        loading : state.loading
+        ingredients : state.burgerBuilder.ingredients,
+        price : state.burgerBuilder.totalPrice,
+        loading : state.order.loading,
+        token : state.auth.token
     }
 }
 
 const mapDispatchToProps = dispatch=>{
     return { 
-        onOrderBurger : (orderData)=>dispatch(orderBurgerActions.purchaseBurger(orderData))
+        onOrderBurger : (orderData,token)=>dispatch(orderBurgerActions.purchaseBurger(orderData,token))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(withErrorHandler(ContactData, Axios));

@@ -23,7 +23,8 @@ const sideDrawer = (props) => {
                     <Logo />
                 </div>
                 <nav>
-                    <NavigationItems />
+                    {/* The isAutheticated is passed to check if the user is autheticated and show logout */}
+                    <NavigationItems isAuthenticated={props.isAuth}/>
                 </nav>
             </div>
         </Aux>

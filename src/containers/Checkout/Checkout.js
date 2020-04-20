@@ -2,12 +2,12 @@
  * Implemented SPA for checkout page
  */
 import React, { Component } from 'react'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary'
-import {Route} from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
 import ContactData from './ContactData/ContactData'
 class Checkout extends Component {
-    
+
 
     /***************************<Other way of doing>******************************
      * 
@@ -36,43 +36,46 @@ class Checkout extends Component {
         this.setState({ingredients:ingredients, price:price});
     }
     ****************************************************************************/
-    
 
-    checkoutCancelledHandler=()=>{
+
+    checkoutCancelledHandler = () => {
         this.props.history.goBack();
     }
 
-    checkoutContinuedHandler=()=>{
+    checkoutContinuedHandler = () => {
         this.props.history.replace('/checkout/contact-data')
     }
 
     render() {
-        return (
-            <div>
-                <CheckoutSummary 
-                ingredients={this.props.ingredients} 
-                checkoutCancelled = {this.checkoutCancelledHandler}
-                checkoutContinued = {this.checkoutContinuedHandler}
+        // Redirect if the ingredients is not set
+        let summary = <Redirect to="/" />
+        if (this.props.ingredients) {
+            const purchasedRedirect = this.props.purchased ? <Redirect to="/" /> : null;
+            summary = (
+                // Redirect if Purhcase is successful
+                < div >
+                { purchasedRedirect }
+                <CheckoutSummary
+                    ingredients={this.props.ingredients}
+                    checkoutCancelled={this.checkoutCancelledHandler}
+                    checkoutContinued={this.checkoutContinuedHandler}
                 />
-               {/* <One way to do it>
-               commented :<Route path={this.props.match.url+'/contact-data'} component={ContactData}/>
-                Passing data between pages 
 
-                <Route path={this.props.match.url+'/contact-data'} 
-                render={(props)=>(<ContactData ingredients={this.props.ingredients} 
-                price={this.props.price} {...props}/>)}/>
-               */}
-                <Route path={this.props.match.url+'/contact-data'} 
-                component={ContactData}/>
-            </div>
-        )
+                <Route path={this.props.match.url + '/contact-data'}
+                    component={ContactData} />
+                </div >
+
+            )
+        }
+        return summary;
     }
 }
 
 const mapStateToProps = state => {
     return {
-        ingredients : state.ingredients,
-        price : state.totalPrice
+        ingredients: state.burgerBuilder.ingredients,
+        price: state.burgerBuilder.totalPrice,
+        purchased: state.order.purchased
     }
 }
 

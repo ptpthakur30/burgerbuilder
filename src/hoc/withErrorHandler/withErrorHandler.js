@@ -7,7 +7,7 @@ import Modal from '../../components/UI/Modal/Modal'
 import Aux from '../Auxiliary/Auxiliary'
 
 const withErrorHandler = (WrappedComponent, axios) => {
-    return class dad extends Component {
+    return class extends Component {
         state={
             error:null
         }
@@ -33,7 +33,7 @@ const withErrorHandler = (WrappedComponent, axios) => {
         componentWillUnmount()
         {
             axios.interceptors.request.eject(this.reqInterceptor);
-            axios.interceptors.request.eject(this.resInterceptor);
+            axios.interceptors.response.eject(this.resInterceptor);
         }
         render() {
             return (

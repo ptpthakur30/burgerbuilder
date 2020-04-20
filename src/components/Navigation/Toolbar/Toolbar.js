@@ -13,7 +13,8 @@ const toolbar = (props) => {
                 <Logo />
             </div>
             <nav className={classes.DesktopOnly}> 
-                <NavigationItems />
+             {/* The isAutheticated is passed to check if the user is autheticated and show logout */}
+                <NavigationItems isAuthenticated={props.isAuth}/>
             </nav>
 
         </header>

@@ -9,5 +9,12 @@
  } from './burgerBuilder'
 
  export {
-    purchaseBurger
+    purchaseBurger,
+    purchaseInit,
+    fetchOrders
  } from './order'
+
+ export {
+    auth,
+    authLogout
+ } from './auth'
