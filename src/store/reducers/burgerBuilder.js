@@ -2,7 +2,7 @@
  * Reducer is a fucntion that takes the old state and action and returns the new state based on the action type
  */
 import * as actionTypes from '../actions/actionTypes'
-import updateObject from '../utility'
+import {updateObject} from '../../shared/utility'
 
 // The price of individual ingerdient
 const INGREDIENT_PRICES = {
