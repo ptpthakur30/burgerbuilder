@@ -30,7 +30,7 @@ export const purchaseBurger = (orderData, token) => {
         // We can call 2 action function from action creater
         dispatch(purchaseBurgerStart());
         // passing the auth token for authentication
-        axios.post('/orders.json?auth='+token, orderData)
+        axios.post('/orders.json?auth=' + token, orderData)
             .then(response => {
                 // The response.data consists of the id 
                 dispatch(purchaseBurgerSuccess(response.data.name, orderData))
@@ -73,14 +73,14 @@ export const fetchOrderStart = () => {
 }
 
 // To fetch the orders from database and pass the token for authentication
-export const fetchOrders = (token,userId) => {
+export const fetchOrders = (token, userId) => {
     return dispatch => {
         dispatch(fetchOrderStart())
         // pass the auth token
         // pass the orderBy="userId" and &equalTo="userId" for filtering by userId
-        const queryParams = '?auth='+token+'&orderBy="userId"'+'&equalTo="'+userId+'"'
+        const queryParams = '?auth=' + token + '&orderBy="userId"' + '&equalTo="' + userId + '"'
         // passing the auth token
-        axios.get('/orders.json'+queryParams)
+        axios.get('/orders.json' + queryParams)
             .then(response => {
                 const fetchedata = [];
                 for (let key in response.data) {
