@@ -4,10 +4,10 @@
  * The Burger 
  * The Build Controls
  */
-import React, { Component } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Aux from '../../hoc/Auxiliary/Auxiliary'
 import Burger from '../../components/Burger/Burger'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch} from 'react-redux'
 import BuildControls from '../../components/Burger/BuildControls/BuildControls'
 import Modal from '../../components/UI/Modal/Modal'
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
@@ -16,17 +16,30 @@ import Spinner from '../../components/UI/Spinner/Spinner'
 import WithErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 import * as actions from '../../store/actions/index'
 
-class BurgerBuilder extends Component {
-    state = {
-        showOrderSummary: false,
-    }
+const burgerBuilder = props => {
+    const [showOrderSummary, setshowOrderSummary] = useState(false)
 
-    componentDidMount() {
-        this.props.onInitIngredients()
-    }
+    // used to dispatch the action
+    const dispatch = useDispatch();
+    const onIngredientAdded = (ingredientName) => dispatch(actions.addIngredients(ingredientName));
+    const onIngredientRemoved = (ingredientName) => dispatch(actions.removeIngredients(ingredientName));
+    // useCallback for caching function so avoid call back loopings
+    const onInitIngredients = useCallback(() => dispatch(actions.initIngredients()), [dispatch]);
+    const onPurchaseInit = () => dispatch(actions.purchaseInit());
+    const onSetAuthRedirectPath = (path) => dispatch(actions.setAuthRedirectPath(path));
+
+    // use selector to get the store value
+    const ingredients = useSelector(state => state.burgerBuilder.ingredients);
+    const price = useSelector(state => state.burgerBuilder.totalPrice);
+    const error = useSelector(state => state.burgerBuilder.error);
+    const isAuthenticated = useSelector(state => state.auth.token !== null);
+
+    useEffect(() => {
+        onInitIngredients()
+    }, [onInitIngredients]);
 
     // To activate or deactivate the Order Now button based on the ingredients total count
-    purchaseHandler = (ingredients) => {
+    const purchaseHandler = (ingredients) => {
         const sum = Object.keys(ingredients)
             .map(igkeys => {
                 return ingredients[igkeys];
@@ -38,102 +51,102 @@ class BurgerBuilder extends Component {
     }
 
     // To check whether the Order Now Button has been clicked or not
-    orderHandler = () => {
+    const orderHandler = () => {
         // if authentication is true then modal is shown
-        if (this.props.isAuthenticated) {
-            this.setState({ showOrderSummary: true });
+        if (isAuthenticated) {
+            setshowOrderSummary(true);
         }
         else {
             // To redirect the user to the auth page if not authenticated
-            this.props.history.push('/auth');
+            props.history.push('/auth');
             // to set the redirect path once the user successfully sign in in authentication page
-            this.props.onSetAuthRedirectPath('/checkout');
+            onSetAuthRedirectPath('/checkout');
         }
     }
 
     // To check whether the Order Now Button has been clicked or not
-    cancelPurchaseHandler = () => {
-        this.setState({ showOrderSummary: false });
+    const cancelPurchaseHandler = () => {
+        setshowOrderSummary(false);
     }
 
-    purchaseContinueHandler = () => {
-        this.props.onPurchaseInit()
-        this.props.history.push('/checkout');
+    const purchaseContinueHandler = () => {
+        onPurchaseInit()
+        props.history.push('/checkout');
     }
 
-    render() {
-        const disabledButton = {
-            ...this.props.ingredients
-        };
-        // {salad:true,meat:true,...}
-        for (let key in disabledButton) {
-            disabledButton[key] = disabledButton[key] <= 0;
-        }
-        let ordersSummary = null;
-        let burger = this.props.error ? <p>Ingredients cannot be loaded</p> : <Spinner />;
-        if (this.props.ingredients) {
-            burger = (
-                <Aux>
-                    {/* Used to see the Burger with all the ingredients */}
-                    <Burger ingredients={this.props.ingredients} />
-
-                    {/* Used to see the controller for adding and removing the ingredients and order now button */}
-                    <BuildControls
-                        ingredientAdded={this.props.onIngredientAdded}
-                        ingredientDeleted={this.props.onIngredientRemoved}
-                        disabledBtn={disabledButton}
-                        currentPrice={this.props.price}
-                        // Call a function when a component renders
-                        purchasable={this.purchaseHandler(this.props.ingredients)}
-                        ordered={this.orderHandler}
-                        isAuth={this.props.isAuthenticated}
-                    />
-                </Aux>
-            );
-            ordersSummary = <OrderSummary
-                ingredients={this.props.ingredients}
-                purchaseContinue={this.purchaseContinueHandler}
-                purchaseCancel={this.cancelPurchaseHandler}
-                price={this.props.price}
-            />
-        }
-
-        return (
+    const disabledButton = {
+        ...ingredients
+    };
+    // {salad:true,meat:true,...}
+    for (let key in disabledButton) {
+        disabledButton[key] = disabledButton[key] <= 0;
+    }
+    let ordersSummary = null;
+    let burger = error ? <p>Ingredients cannot be loaded</p> : <Spinner />;
+    if (ingredients) {
+        burger = (
             <Aux>
-                {/* Used to see the model and Order Summary within it */}
-                {/* The Order summary should only be rendered when the modal is rendered
+                {/* Used to see the Burger with all the ingredients */}
+                <Burger ingredients={ingredients} />
+
+                {/* Used to see the controller for adding and removing the ingredients and order now button */}
+                <BuildControls
+                    ingredientAdded={onIngredientAdded}
+                    ingredientDeleted={onIngredientRemoved}
+                    disabledBtn={disabledButton}
+                    currentPrice={price}
+                    // Call a function when a component renders
+                    purchasable={purchaseHandler(ingredients)}
+                    ordered={orderHandler}
+                    isAuth={isAuthenticated}
+                />
+            </Aux>
+        );
+        ordersSummary = <OrderSummary
+            ingredients={ingredients}
+            purchaseContinue={purchaseContinueHandler}
+            purchaseCancel={cancelPurchaseHandler}
+            price={price}
+        />
+    }
+
+    return (
+        <Aux>
+            {/* Used to see the model and Order Summary within it */}
+            {/* The Order summary should only be rendered when the modal is rendered
                 Therefore we can improve performance by adding class component lifecycle
                 */}
-                <Modal show={this.state.showOrderSummary} clicked={this.cancelPurchaseHandler}>
-                    {ordersSummary}
-                </Modal>
-                {burger}
-            </Aux>
-        )
-    }
+            <Modal show={showOrderSummary} clicked={cancelPurchaseHandler}>
+                {ordersSummary}
+            </Modal>
+            {burger}
+        </Aux>
+    )
+
 }
 
-// for getting the slide of state from store as props
-const mapStateToProps = state => {
-    return {
-        ingredients: state.burgerBuilder.ingredients,
-        price: state.burgerBuilder.totalPrice,
-        error: state.burgerBuilder.error,
-        isAuthenticated: state.auth.token !== null
-    }
-}
+// // for getting the slide of state from store as props
+// const mapStateToProps = state => {
+//     return {
+//         ingredients: state.burgerBuilder.ingredients,
+//         price: state.burgerBuilder.totalPrice,
+//         error: state.burgerBuilder.error,
+//         isAuthenticated: state.auth.token !== null
+//     }
+// }
 
-// for redux reducer to get the action
-const mapDispatchToProps = dispatch => {
-    return {
-        // use dispatch here
-        onIngredientAdded: (ingredientName) => dispatch(actions.addIngredients(ingredientName)),
-        onIngredientRemoved: (ingredientName) => dispatch(actions.removeIngredients(ingredientName)),
-        onInitIngredients: () => dispatch(actions.initIngredients()),
-        onPurchaseInit: () => dispatch(actions.purchaseInit()),
-        onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path))
-    }
-};
+// // for redux reducer to get the action
+// const mapDispatchToProps = dispatch => {
+//     return {
+//         // use dispatch here
+//         onIngredientAdded: (ingredientName) => dispatch(actions.addIngredients(ingredientName)),
+//         onIngredientRemoved: (ingredientName) => dispatch(actions.removeIngredients(ingredientName)),
+//         onInitIngredients: () => dispatch(actions.initIngredients()),
+//         onPurchaseInit: () => dispatch(actions.purchaseInit()),
+//         onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path))
+//     }
+// };
+
 
 // the connect is used to pass the action and use the state as props in the container
-export default connect(mapStateToProps, mapDispatchToProps)(WithErrorHandler(BurgerBuilder, Axios));
+export default (WithErrorHandler(burgerBuilder, Axios));
