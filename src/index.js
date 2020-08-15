@@ -10,24 +10,33 @@ import burgerBuilderReducer from './store/reducers/burgerBuilder'
 import orderReducer from './store/reducers/order'
 import authReducer from './store/reducers/auth'
 import thunk from 'redux-thunk';
+import createSagaMiddleware from 'redux-saga'
+import { watchAuth } from './store/sagas/index'
 
 const rootReducer = combineReducers({
     burgerBuilder: burgerBuilderReducer,
     order: orderReducer,
     auth: authReducer
 })
+
+// creates a saga middleware
+const sagaMiddleware = createSagaMiddleware();
+
 // store needs reducer redux
 // It is added for dev tools =>  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 // process.env.NODE_ENV === 'development'  is used to check for development server
-const composeEnhancers = process.env.NODE_ENV === 'development' 
-? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ 
-: null 
-|| compose;
+const composeEnhancers = process.env.NODE_ENV === 'development'
+    ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+    : null
+    || compose;
 const store = createStore(rootReducer,
     composeEnhancers(
         // thunk is a middleware used to handle async code
-        applyMiddleware(thunk)
+        // sagaMiddleware is a middleware provided by saga
+        applyMiddleware(thunk, sagaMiddleware)
     ));
+
+sagaMiddleware.run(watchAuth);
 
 const app = (
     <Provider store={store} >

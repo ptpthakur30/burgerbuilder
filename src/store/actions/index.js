@@ -18,5 +18,6 @@
     auth,
     authLogout,
     setAuthRedirectPath,
-    checkAuthState
+    checkAuthState,
+    logoutsucceed
  } from './auth'

@@ -18,11 +18,9 @@ export const authSuccess = (token, userId) => {
 
 // To set the time of the logout
 export const checkAuthTimeout = (expirationTime) => {
-    return dispatch => {
-        setTimeout(() => {
-            dispatch(authLogout())
-            // For converting to milliseconds
-        }, expirationTime * 1000)
+    return {
+        type : actionTypes.AUTHENTICATION_CHECK_TIMEOUT,
+        expirationTime : expirationTime
     }
 }
 
@@ -68,10 +66,13 @@ export const authFail = (error) => {
     }
 }
 export const authLogout = () => {
-    // remove local storage
-    localStorage.removeItem('token')
-    localStorage.removeItem('expirationDate');
-    localStorage.removeItem('userId');
+    return {
+        type: actionTypes.AUTHENTICATION_INITIATE_LOGOUT
+    }
+}
+
+// If the logout succeed
+export const logoutsucceed = ()=>{
     return {
         type: actionTypes.AUTHENTICATION_LOGOUT
     }
@@ -89,7 +90,7 @@ export const checkAuthState = () => {
     return dispatch => {
         const token = localStorage.getItem('token');
         if (!token) {
-            dispatch(authLogout);
+            dispatch(authLogout());
         }
         else {
             // To get the expiration date
